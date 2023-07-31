@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react'
+import useSWR from 'swr'
+// import '/App.css'
+const fetcher = url => fetch(url).then(r => r.json())
+const getIdFromUrl = (url) => {
+  const parts = url.split('/');
+  return parts[parts.length - 2];
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const { data, error } = useSWR('https://pokeapi.co/api/v2/pokemon', fetcher)
+if(data){
+  console.log(data)
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div>
+    <h1>List of Pokémon</h1>
+    <div style={{
+      width:"100%",
+
+      display:"grid",
+      gridTemplateColumns: "1fr 1fr 1fr 1fr"
+    }}>
+      {data.results.map((pokemon) => (
+        <div key={pokemon.name} style={{
+          width:"100%"
+        }}>
+          <img
+            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${getIdFromUrl(pokemon.url)}.png`}
+            alt={pokemon.name}
+            style={{
+              width:"100%"
+            }}
+          />
+         <span style={{
+          textAlign:"center"
+         }}>{pokemon.name} </span>
+        </div>
+      ))}
     </div>
-  )
+  </div>)
+}
+if(error){
+  console.log(error);
+}
+
+  
 }
 
 export default App
